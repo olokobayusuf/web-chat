@@ -12,7 +12,7 @@ Sign up on [Muna](https://muna.ai) then [create an access key](https://www.muna.
 MUNA_ACCESS_KEY="<your access key here>"
 ```
 
-Next, install all Python packages:
+Next, install all JavaScript packages:
 ```sh
 # Install Node modules
 $ npm install
@@ -49,7 +49,16 @@ for await (const chunk of stream) {
 ## Trying Different LLMs
 The [chat.py](chat.py) Python script contains a minimal function that uses the 
 [`llama-cpp-python`](https://github.com/abetlen/llama-cpp-python) library to run an LLM. You can update it to fetch a 
-different LLM from HuggingFace; or a local `*.gguf` model file.
+different LLM from HuggingFace; or a local `*.gguf` model file:
+
+```py
+# Load Geema 3 270M model from HuggingFace
+model_path = hf_hub_download(
+    "unsloth/gemma-3-270m-it-GGUF",
+    "gemma-3-270m-it-F16.gguf"
+)
+model = Llama(model_path=model_path, verbose=False)
+```
 
 Once updated, first install Muna for Python:
 ```sh
