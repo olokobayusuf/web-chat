@@ -1,6 +1,6 @@
 # Web Chat Demo
 
-[Image here]
+![Screenshot](public/ui.png)
 
 This is a tiny project demonstrating running an open-source LLM from HuggingFace in the browser. We use [Muna](https://muna.ai) 
 to compile a Python function that runs an LLM; then vibe-code a chat UI in Next.js to run it.
