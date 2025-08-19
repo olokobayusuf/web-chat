@@ -1,0 +1,3 @@
+huggingface_hub
+llama-cpp-python
+muna

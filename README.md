@@ -1,36 +1,77 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Web Chat Demo
 
-## Getting Started
+[Image here]
 
-First, run the development server:
+This is a tiny project demonstrating running an open-source LLM from HuggingFace in the browser. We use [Muna](https://muna.ai) 
+to compile a Python function that runs an LLM; then vibe-code a chat UI in Next.js to run it.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Setup Instructions
+Sign up on [Muna](https://muna.ai) then [create an access key](https://www.muna.ai/settings/developer) and paste it in your `.env.local` file:
+```sh
+# Muna
+MUNA_ACCESS_KEY="<your access key here>"
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Next, install all Python packages:
+```sh
+# Install Node modules
+$ npm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Finally, start the development server:
+```sh
+# Run this in Terminal
+$ npm run dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+And open the website in your browser.
 
-## Learn More
+## How it Works
+Muna compiles the Python chat function in [`chat.py`](chat.py) into self-contained binaries that run across different platforms. 
+At runtime, we use the Muna client's mock-OpenAI interface to run the model:
+```js
+// Create a streaming chat completion
+const stream = await muna.beta.chat.completions.create({
+  model: "@yusuf/gemma-3-270m",
+  messages: [
+    { role: "user", content: trimmed }
+  ],
+  stream: true
+});
 
-To learn more about Next.js, take a look at the following resources:
+// Consume completion chunks
+for await (const chunk of stream) {
+    const token = chunk?.choices?.[0]?.delta?.content ?? "";
+    ...
+}
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Trying Different LLMs
+The [chat.py](chat.py) Python script contains a minimal function that uses the 
+[`llama-cpp-python`](https://github.com/abetlen/llama-cpp-python) library to run an LLM. You can update it to fetch a 
+different LLM from HuggingFace; or a local `*.gguf` model file.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Once updated, first install Muna for Python:
+```sh
+# Run this in Terminal
+$ pip install -r requirements.txt
+```
 
-## Deploy on Vercel
+Then modify `chat.py`, specifically the `@compile` decorator, with your Muna username:
+```diff
+# Define the chat function
+@compile(
+-    tag="@yusuf/gemma-3-270m",
++    tag="@username/gemma-3-270m"
+    ...
+)
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Finally, compile `chat.py` with Muna:
+```sh
+# Run this in Terminal
+$ muna compile --overwrite chat.py
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Resources
+- See the [Muna documentation](https://docs.muna.ai).
